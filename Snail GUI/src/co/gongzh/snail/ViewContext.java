@@ -491,9 +491,10 @@ public class ViewContext {
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (!content.isFocusOwner()) {
-					content.requestFocusInWindow();
-				}
+				// NOTE: client should take the responsibility of focus request
+//				if (!content.isFocusOwner()) {
+//					content.requestFocusInWindow();
+//				}
 				currentMousePosition = Vector2D.make(e.getPoint());
 				pressedMouseButton = e.getButton();
 				co.gongzh.snail.MouseEvent event = new co.gongzh.snail.MouseEvent(e, getVelocity());
