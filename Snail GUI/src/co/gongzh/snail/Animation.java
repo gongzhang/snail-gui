@@ -194,7 +194,7 @@ abstract public class Animation {
 	
 	public final Animation makeDelay(float delay) {
 		final Animation target = this;
-		return new Animation(delay) {
+		return new Animation(delay, this.mutex) {
 			@Override
 			protected void animate(float progress) {}
 			@Override
