@@ -56,12 +56,16 @@ public abstract class CaretView extends View {
 		public void showCaret() {
 			setHidden(false);
 			setAlpha(1.0f);
-			flickerAnimation.commit();
+			if (!flickerAnimation.isPlaying()) {
+				flickerAnimation.commit();
+			}
 		}
 
 		@Override
 		public void hideCaret() {
-			if (flickerAnimation.isPlaying()) flickerAnimation.cancel();
+			if (flickerAnimation.isPlaying()) {
+				flickerAnimation.cancel();
+			}
 			setHidden(true);
 		}
 

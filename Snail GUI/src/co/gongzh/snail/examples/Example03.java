@@ -28,7 +28,7 @@ public class Example03 extends View {
 //		textView.setText("1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 		textView.setBreakIterator(BreakIterator.getLineInstance());
 		textView.setTextAlignment(Alignment.LEFT_TOP);
-//		textView.setInsets(Insets.make(20, 20, 20, 20));
+		textView.setInsets(Insets.make(20, 20, 20, 20));
 		textView.setTextColor(Range.make(16, 5), Color.RED);
 		addSubview(textView);
 		
@@ -45,8 +45,8 @@ public class Example03 extends View {
 	public void setSize(int width, int height) {
 		super.setSize(width, height);
 		if (textView != null) {
-			textView.setPosition(170, 170);
-			textView.setSize(width - 340, height - 340);
+			textView.setPosition(50, 50);
+			textView.setSize(width - 100, height - 100);
 		}
 	}
 
@@ -56,12 +56,12 @@ public class Example03 extends View {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(600, 400);
-		frame.setVisible(true);
 		
 		// bridge to Snail GUI
 		ViewContext context = new ViewContext(frame.getContentPane());
 		context.setRootView(new Example03());
 		
+		frame.setVisible(true);
 	}
 
 }
