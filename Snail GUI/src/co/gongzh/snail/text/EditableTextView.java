@@ -182,7 +182,7 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 	        // translate to screen coordinates
 	        Point location = getViewContext().getSwingContainer().getLocationOnScreen();
 	        rectangle.translate(location.x, location.y);
-
+	        System.out.println(rectangle); // TODO
 	        return rectangle;
 		}
 		
