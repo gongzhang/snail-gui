@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedCharacterIterator.Attribute;
 
-import javax.swing.SwingUtilities;
-
 import co.gongzh.snail.KeyEvent;
 import co.gongzh.snail.View;
 import co.gongzh.snail.event.EventHandler;
@@ -157,15 +155,12 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 		
 	};
 	
-	private static final String OS = System.getProperty("os.name");
-	private static final boolean IS_WINDOWS = OS != null && OS.startsWith("Windows");
-	
 	private final InputMethodRequests inputMethodRequests = new InputMethodRequests() {
 		
 		@Override
 		public Rectangle getTextLocation(TextHitInfo offset) {
 	        CaretIndex caretIndex;
-	        if (offset == null || !composing) {
+	        if (offset == null) {
 	            // no composed text: return caret for committed text
 	            caretIndex = getCaretPosition();
 	        } else {
@@ -187,12 +182,6 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 	        // translate to screen coordinates
 	        Point location = getViewContext().getSwingContainer().getLocationOnScreen();
 	        rectangle.translate(location.x, location.y);
-	        
-	        // XXX: this is bug in JRE 7 on Windows
-	        if (IS_WINDOWS) {
-	        	rectangle.y -= 45;
-	        }
-	        
 	        return rectangle;
 		}
 		
@@ -209,21 +198,21 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 			// standard swing screen coordinates, however, it's MAC OS Quartz2D coordinates which
 			// is that (0,0) is left-bottom corner, not left-top corner.
 			
-			Point point = new Point(x, y);
-			SwingUtilities.convertPointFromScreen(point, getViewContext().getSwingContainer());
-			Vector2D vec = getPositionInRootView();
-			point.x -= vec.x;
-			point.y -= vec.y;
+//			Point point = new Point(x, y);
+//			SwingUtilities.convertPointFromScreen(point, getViewContext().getSwingContainer());
+//			Vector2D vec = getPositionInRootView();
+//			point.x -= vec.x;
+//			point.y -= vec.y;
+//			
+//			int index = charIndexOnPoint(Vector2D.make(point));
+//			if (index >= composedTextRange.offset && index < composedTextRange.offset + composedTextRange.length) {
+//				System.out.println(index - composedTextRange.offset);
+//				return TextHitInfo.leading(index - composedTextRange.offset);
+//			} else {
+//				return TextHitInfo.leading(0);
+//			}
 			
-			int index = charIndexOnPoint(Vector2D.make(point));
-			if (index >= composedTextRange.offset && index < composedTextRange.offset + composedTextRange.length) {
-				System.out.println(index - composedTextRange.offset);
-				return TextHitInfo.leading(index - composedTextRange.offset);
-			} else {
-				return TextHitInfo.leading(0);
-			}
-			
-//			return TextHitInfo.leading(0);
+			return TextHitInfo.leading(0);
 		}
 		
 		@Override
