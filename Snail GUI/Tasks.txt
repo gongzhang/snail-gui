@@ -1,0 +1,16 @@
+Snail GUI 5 Tasks:
+  Provides simple and highly-customizable lightweight GUI framework.
+
+To-do:
+
+- Better mouse and key event listener.
+
+- Concrete animation object.
+- Quick animation expression.
+- Quick image loader.
+
+- Better composition principle.
+- Better graphics context state management.
+- Better graphical buffer usage.
+- Supports localized repaint area.
+- Supports customized clip shape.
