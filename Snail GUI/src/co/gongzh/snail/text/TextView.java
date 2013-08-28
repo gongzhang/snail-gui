@@ -78,6 +78,10 @@ public class TextView extends View implements ITextLayout {
 		return text.toString();
 	}
 	
+	public String getPlainText(Range range) {
+		return text.substring(range).toString();
+	}
+	
 	public void setText(AttributedString str) {
 		text.clear();
 		text.append(str);

@@ -34,11 +34,14 @@ import co.gongzh.snail.KeyEvent;
 import co.gongzh.snail.View;
 import co.gongzh.snail.event.EventHandler;
 import co.gongzh.snail.event.Key;
+import co.gongzh.snail.text.TextChangeEvent.TextChangeType;
 import co.gongzh.snail.util.Range;
 import co.gongzh.snail.util.Vector2D;
 
 public class EditableTextView extends EditableTextViewBase implements InputMethodCompatible {
 
+	public final static Key TEXT_CHANGED_BY_UI = new Key("textChangedByUI", EditableTextView.class, TextChangeEvent.class);
+	
 	private final Range composedTextRange;
 	private boolean composing;
 	
@@ -83,7 +86,9 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 				if (getSelectionRange().length > 0) {
 					// replace current selected text
 					setCaretPosition(CaretIndex.before(getSelectionRange().offset));
+					String delText = getPlainText(getSelectionRange());
 					deleteText(getSelectionRange());
+					fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, getSelectionRange().offset, delText));
 				}
 				composedTextRange.set(getCaretPosition().toBefore().charIndex, 0);
 			}
@@ -101,6 +106,7 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 			// commit text
 			if (committed.length() > 0) {
 				insertText(composedTextRange.offset, committed);
+				fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.INSERT, composedTextRange.offset, committed.toString()));
 				composedTextRange.offset += committed.length();
 			}
 			
@@ -287,11 +293,14 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 				Range sel = getSelectionRange();
 				if (sel.length > 0) {
 					setCaretPosition(CaretIndex.before(sel.offset));
+					String delText = getPlainText(sel);
 					deleteText(sel);
+					fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, sel.offset, delText));
 				}
 				
 				final int index = getCaretPosition().toBefore().charIndex;
 				insertText(index, text);
+				fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.INSERT, index, text.toString()));
 				setCaretPosition(CaretIndex.before(index + text.length()));
 			}
 		}
@@ -338,14 +347,22 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 			if (sel.length > 0) {
 				setSelectionRange(Range.make(sel.offset, 0));
 				setCaretPosition(CaretIndex.before(sel.offset));
+				String delText = getPlainText(sel);
 				deleteText(sel);
+				fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, sel.offset, delText));
 			} else if (caret.toBefore().charIndex > 0) {
 				if (!shift) {
 					setCaretPosition(CaretIndex.before(caret.toBefore().charIndex - 1));
-					deleteText(Range.make(caret.toBefore().charIndex - 1, 1));
+					Range delRange = Range.make(caret.toBefore().charIndex - 1, 1);
+					String delText = getPlainText(delRange);
+					deleteText(delRange);
+					fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, delRange.offset, delText));
 				} else {
 					setCaretPosition(CaretIndex.before(0));
-					deleteText(Range.make(0, caret.toBefore().charIndex));
+					Range delRange = Range.make(0, caret.toBefore().charIndex);
+					String delText = getPlainText(delRange);
+					deleteText(delRange);
+					fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, delRange.offset, delText));
 				}
 			}
 			break;
@@ -354,12 +371,20 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 			if (sel.length > 0) {
 				setSelectionRange(Range.make(sel.offset, 0));
 				setCaretPosition(CaretIndex.before(sel.offset));
+				String delText = getPlainText(sel);
 				deleteText(sel);
+				fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, sel.offset, delText));
 			} else if (caret.toBefore().charIndex < textLength()) {
 				if (!shift) {
-					deleteText(Range.make(caret.toBefore().charIndex, 1));
+					Range delRange = Range.make(caret.toBefore().charIndex, 1);
+					String delText = getPlainText(delRange);
+					deleteText(delRange);
+					fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, delRange.offset, delText));
 				} else {
-					deleteText(Range.make(caret.toBefore().charIndex, textLength() - caret.toBefore().charIndex));
+					Range delRange = Range.make(caret.toBefore().charIndex, textLength() - caret.toBefore().charIndex);
+					String delText = getPlainText(delRange);
+					deleteText(delRange);
+					fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, delRange.offset, delText));
 				}
 			}
 			break;
@@ -456,7 +481,9 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 				if (keyCode == VK_X) {
 					setSelectionRange(null);
 					setCaretPosition(CaretIndex.before(sel.offset));
+					String delText = getPlainText(sel);
 					deleteText(sel);
+					fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, sel.offset, delText));
 				}
 			}
 			break;
@@ -470,12 +497,15 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 						if (sel.length > 0) {
 							setSelectionRange(null);
 							setCaretPosition(CaretIndex.before(sel.offset));
+							String delText = getPlainText(sel);
 							deleteText(sel);
+							fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, sel.offset, delText));
 						}
 						AttributedString text = new AttributedString(string, null, null);
 						filterUserInputText(text);
 						applyFontAndColorOnCommittedText(text);
 						Range range = insertText(getCaretPosition().toBefore().charIndex, text);
+						fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.INSERT, range.offset, text.toString()));
 						setCaretPosition(CaretIndex.before(range.offset + range.length));
 					}
 				} catch (UnsupportedFlavorException e1) {
@@ -493,10 +523,13 @@ public class EditableTextView extends EditableTextViewBase implements InputMetho
 						applyFontAndColorOnCommittedText(text);
 						if (sel.length > 0) {
 							setCaretPosition(CaretIndex.before(sel.offset));
+							String delText = getPlainText(sel);
 							deleteText(sel);
+							fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.DELETE, sel.offset, delText));
 						}
 						final int index = getCaretPosition().toBefore().charIndex;
 						insertText(index, text);
+						fireEvent(TEXT_CHANGED_BY_UI, new TextChangeEvent(TextChangeType.INSERT, index, text.toString()));
 						setCaretPosition(CaretIndex.before(index + text.length()));
 					}
 				}
