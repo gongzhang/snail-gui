@@ -16,6 +16,7 @@ public class HandlerBundle {
 	}
 	
 	public boolean addHandler(Key key, EventHandler handler) {
+		if (handler == null) throw new IllegalArgumentException();
 		List<EventHandler> list = handlerMap.get(key);
 		if (list == null) {
 			list = new LinkedList<EventHandler>();
@@ -30,6 +31,7 @@ public class HandlerBundle {
 	}
 	
 	public boolean removeHandler(Key key, EventHandler handler) {
+		if (handler == null) throw new IllegalArgumentException();
 		List<EventHandler> list = handlerMap.get(key);
 		if (list != null && list.contains(handler)) {
 			return list.remove(handler);
